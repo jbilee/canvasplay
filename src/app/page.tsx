@@ -1,37 +1,66 @@
-import Link from "next/link";
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { Layer, Stage } from "react-konva";
+import Bubble from "~/components/Bubble";
+
+type BubbleProps = {
+  text: string;
+  id: string;
+  x: number;
+  y: number;
+};
+
+const getRandomValue = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max + 1 - min) + min);
+};
 
 export default function HomePage() {
+  const [input, setInput] = useState("");
+  const [bubbles, setBubbles] = useState<BubbleProps[]>([]);
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setBubbles((prev) => [
+      ...prev,
+      {
+        text: input,
+        id: crypto.randomUUID(),
+        x: getRandomValue(0, 900),
+        y: getRandomValue(0, 500),
+      },
+    ]);
+    setInput("");
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
-        </div>
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <div className="border border-black">
+        <Stage width={1200} height={600}>
+          <Layer>
+            {bubbles.map((elem) => (
+              <Bubble key={elem.id} text={elem.text} x={elem.x} y={elem.y} />
+            ))}
+            {/* <Rect
+              cornerRadius={10}
+              x={500}
+              y={100}
+              width={100}
+              height={50}
+              fill="coral"
+              draggable
+            />
+            <Circle x={200} y={100} radius={50} fill="green" draggable />
+            <Text text="hello????l" fontSize={20} draggable /> */}
+          </Layer>
+        </Stage>
       </div>
+      <form onSubmit={onSubmit}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <input type="submit" value="Add" />
+      </form>
     </main>
   );
 }
